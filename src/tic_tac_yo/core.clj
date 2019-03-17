@@ -1,58 +1,68 @@
 (ns tic-tac-yo.core
-  ;(require [tic-tac-yo.board :as board]
-  ;         [tic-tac-yo.formatting :as formatting]
-  ;         [tic-tac-yo.user-move :as user-move])
-  )
+  (:gen-class))
 
 (declare handle-user-input)
 
 ;-----------------
 ;BOARD
 ;-----------------
+(def winning-combos
+  [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]])
+
 (def board
   (atom (repeat 9 nil)))
 
 (def x-spots
+  "Returns indices of spots currently occupied by X"
   (atom ()))
 
 (def o-spots
+  "Returns indices of spots currently occupied by O"
   (atom ()))
 
 (defn open-spots
   "Returns indices of open spots"
   []
-  (println (keep-indexed #(if (nil? %2) %1) @board))
   (keep-indexed #(if (nil? %2) %1) @board))
+
+(defn all-spots-filled?
+  []
+  (not-any? nil? @board))
 
 ;-----------------
 ;FORMATTING
 ;-----------------
+(defn pad-spot
+  [spot]
+  (if (nil? spot) "   " (str " " spot " ")))
+
 (defn format-row
   "Returns a user-friendly formatted row
    Ex: X |  | O "
   [row]
-  (clojure.string/join "|" (map #(str " " % " ") row)))
+  (clojure.string/join "|" (map pad-spot row)))
 
 (defn print-formatted-board
   "Returns a user-friendly formatted board
    Ex: X |   | O
+      ------------
          | O |
-         | X | X "
+      ------------
+         | X | X  "
   []
   (doall (map
            #(do
               (println (format-row %))
-              (println "-----------")
-              )
+              (println "-----------"))
            (partition 3 @board))))
 
-(def winning-combos
-  [[0, 1, 2] [3, 4, 5] [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]])
-
+;-----------------
+;CHECK WIN
+;-----------------
 (defn declare-winner-and-exit
   [winner]
   (print-formatted-board)
-  (println (str winner " wins! Game Yover."))
+  (println (str winner " wins! Game YOver."))
   (System/exit 0))
 
 (defn check-for-win
@@ -61,6 +71,21 @@
     (some #(.containsAll @o-spots %) winning-combos) (declare-winner-and-exit "O")
     (some #(.containsAll @x-spots %) winning-combos) (declare-winner-and-exit "X")
     :else nil))
+
+;-----------------
+;COMPUTER + USER MOVES
+;-----------------
+(defn ask-for-user-move
+  []
+  (do
+    (print-formatted-board)
+    (println "Please select your spot 0 - 8")
+    (read-line)))
+
+(defn validate-input
+  [input]
+  "Checks whether the given string input is an open spot. Returns as number if it is."
+  (if (.contains (map str (open-spots)) input) (read-string input)))
 
 (defn record-play
   [spot x-or-o]
@@ -74,27 +99,6 @@
     (reset! board updated-board)
     (record-play spot x-or-o)
     (check-for-win)))
-
-(defn all-spots-filled?
-  []
-  (not-any? nil? @board))
-
-;-----------------
-;USER MOVE
-;-----------------
-(defn validate-input
-  [input]
-  "Checks whether the given string input is an open spot. Returns index if it is."
-  (println input)
-  (if (.contains (map str (open-spots)) input) (read-string input)))
-
-
-(defn ask-for-user-move
-  []
-  (do
-    (print-formatted-board)
-    (println "Please select your spot 0 - 9")
-    (read-line)))
 
 (defn make-computer-move
   []

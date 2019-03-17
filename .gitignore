@@ -1,5 +1,4 @@
 /target
-/classes
 /checkouts
 pom.xml
 pom.xml.asc
@@ -9,3 +8,4 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+.idea/

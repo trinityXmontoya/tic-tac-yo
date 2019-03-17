@@ -32,23 +32,25 @@
 ;-----------------
 ;FORMATTING
 ;-----------------
-(defn pad-spot
+(defn format-spot
+  "Returns user-friendly formatted spot
+   Ex: ' X '"
   [spot]
   (if (nil? spot) "   " (str " " spot " ")))
 
 (defn format-row
-  "Returns a user-friendly formatted row
-   Ex: X |  | O "
+  "Returns user-friendly formatted row
+   Ex: ' X |   | O '"
   [row]
-  (clojure.string/join "|" (map pad-spot row)))
+  (clojure.string/join "|" (map format-spot row)))
 
 (defn print-formatted-board
   "Returns a user-friendly formatted board
-   Ex: X |   | O
-      ------------
-         | O |
-      ------------
-         | X | X  "
+   Ex: ' X |   | O
+        ------------
+           | O |
+        ------------
+           | X | X  '"'
   []
   (doall (map
            #(do

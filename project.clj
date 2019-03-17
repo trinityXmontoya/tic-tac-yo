@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]]
+  :profiles {:uberjar {:aot [tic-tac-yo.core]}}
   :main tic-tac-yo.core)

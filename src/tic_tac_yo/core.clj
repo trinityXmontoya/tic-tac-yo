@@ -58,6 +58,7 @@
               (println "-----------"))
            (partition 3 @board))))
 
+
 ;-----------------
 ;CHECK WIN
 ;-----------------
@@ -72,6 +73,7 @@
   (cond
     (some #(.containsAll @o-spots %) winning-combos) (declare-winner-and-exit "O")
     (some #(.containsAll @x-spots %) winning-combos) (declare-winner-and-exit "X")
+    (all-spots-filled?) (declare-winner-and-exit "No one")
     :else nil))
 
 ;-----------------

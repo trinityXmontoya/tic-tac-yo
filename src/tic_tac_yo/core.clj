@@ -50,10 +50,10 @@
 (defn print-formatted-board
   "Returns a user-friendly formatted board
    Ex: ' X |   | O
-        ------------
+        -----------
            | O |
-        ------------
-           | X | X  '"
+        -----------
+           | X | X '"
   []
   (doall (map
            #(do
@@ -70,11 +70,19 @@
   (println (str winner " wins! Game YOver."))
   (System/exit 0))
 
+(defn x-wins?
+  []
+  (some #(.containsAll @x-spots %) winning-combos))
+
+(defn o-wins?
+  []
+  (some #(.containsAll @o-spots %) winning-combos))
+
 (defn check-for-win
   []
   (cond
-    (some #(.containsAll @o-spots %) winning-combos) (declare-winner-and-exit "O")
-    (some #(.containsAll @x-spots %) winning-combos) (declare-winner-and-exit "X")
+    (x-wins?) (declare-winner-and-exit "X")
+    (o-wins?) (declare-winner-and-exit "O")
     (all-spots-filled?) (declare-winner-and-exit "No one")
     :else nil))
 

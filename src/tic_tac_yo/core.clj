@@ -24,7 +24,9 @@
 (defn open-spots
   "Returns indices of open spots"
   []
-  (keep-indexed #(if (nil? %2) %1) @board))
+  (keep-indexed
+    (fn [index val] (if (nil? val) index))
+    @board))
 
 (defn all-spots-filled?
   []

@@ -2,8 +2,6 @@
   (:require [clojure.string :as s])
   (:gen-class))
 
-(declare handle-user-input)
-
 ;-----------------
 ;BOARD
 ;-----------------
@@ -11,21 +9,21 @@
   [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]])
 
 (def board
-  (atom (repeat 9 nil)))
+  (atom (vec (repeat 9 nil))))
 
 (def x-spots
   "Returns indices of spots currently occupied by X"
-  (atom ()))
+  (atom []))
 
 (def o-spots
   "Returns indices of spots currently occupied by O"
-  (atom ()))
+  (atom []))
 
 (defn open-spots
   "Returns indices of open spots"
   []
   (keep-indexed
-    (fn [index val] (if (nil? val) index))
+    (fn [index val] (when (nil? val) index))
     @board))
 
 (defn all-spots-filled?
@@ -55,7 +53,7 @@
         -----------
            | X | X '"
   []
-  (doall (map
+  (dorun (map
            #(do
               (println (format-row %))
               (println "-----------"))
@@ -67,7 +65,7 @@
 (defn declare-winner-and-exit
   [winner]
   (print-formatted-board)
-  (println (str winner " wins! Game YOver."))
+  (println winner " wins! Game YOver.")
   (System/exit 0))
 
 (defn x-wins?
@@ -83,23 +81,25 @@
   (cond
     (x-wins?) (declare-winner-and-exit "X")
     (o-wins?) (declare-winner-and-exit "O")
-    (all-spots-filled?) (declare-winner-and-exit "No one")
-    :else nil))
+    (all-spots-filled?) (declare-winner-and-exit "No one")))
 
 ;-----------------
 ;COMPUTER + USER MOVES
 ;-----------------
 (defn ask-for-user-move
   []
-  (do
-    (print-formatted-board)
-    (println "Please select your spot 0 - 8")
-    (read-line)))
+  (print-formatted-board)
+  (println "Please select your spot 0 - 8")
+  (s/trim (read-line)))
+
+(defn valid-input?
+  [input]
+  (contains? (set (map str (open-spots))) input))
 
 (defn validate-input
   [input]
   "Checks whether the given string input is an open spot. Returns cast to number if it is."
-  (if (.contains (map str (open-spots)) input) (read-string input)))
+  (when (valid-input? input) (read-string input)))
 
 (defn record-play
   [spot x-or-o]
@@ -114,13 +114,13 @@
     (record-play spot x-or-o)
     (check-for-win)))
 
+(declare handle-user-input)
 (defn make-computer-move
   []
   (let [spot (rand-nth (open-spots))]
-    (do
-      (println "Computer is thinking...")
-      (fill-spot spot "O")
-      (handle-user-input (ask-for-user-move)))))
+    (println "Computer is thinking...")
+    (fill-spot spot "O")
+    (handle-user-input (ask-for-user-move))))
 
 (defn make-user-move
   [spot]
@@ -128,16 +128,13 @@
   (print-formatted-board)
   (make-computer-move))
 
-(defn handle-invalid-user-input
-  [input]
-  (println (str input " is not a playable spot. Try again."))
-  (handle-user-input (ask-for-user-move)))
-
 (defn handle-user-input
   [input]
   (if-let [spot (validate-input input)]
     (make-user-move spot)
-    (handle-invalid-user-input input)))
+    (do
+      (println input " is not a playable spot. Try again.")
+      (recur (ask-for-user-move)))))
 
 ;-----------------
 ;GAME

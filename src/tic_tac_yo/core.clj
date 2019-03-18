@@ -110,13 +110,13 @@
     (do
       (println "Computer is thinking...")
       (fill-spot spot "O")
-      (if (all-spots-filled?) (check-for-win) (handle-user-input (ask-for-user-move))))))
+      (handle-user-input (ask-for-user-move)))))
 
 (defn make-user-move
   [spot]
   (fill-spot spot "X")
   (print-formatted-board)
-  (if (all-spots-filled?) (check-for-win) (make-computer-move)))
+  (make-computer-move))
 
 (defn handle-invalid-user-input
   [input]

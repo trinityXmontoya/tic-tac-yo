@@ -1,5 +1,6 @@
 (ns tic-tac-yo.core
-  (:require [clojure.string :as s])
+  (:require [clojure.string :as s]
+            [clojure.set :as set])
   (:gen-class))
 
 ;-----------------
@@ -11,19 +12,11 @@
 (def board
   (atom (vec (repeat 9 nil))))
 
-(def x-spots
-  "Returns indices of spots currently occupied by X"
-  (atom []))
-
-(def o-spots
-  "Returns indices of spots currently occupied by O"
-  (atom []))
-
 (defn open-spots
   "Returns indices of open spots"
   []
   (keep-indexed
-    (fn [index val] (when (nil? val) index))
+    (fn [idx val] (when (nil? val) idx))
     @board))
 
 (defn all-spots-filled?
@@ -54,9 +47,9 @@
            | X | X '"
   []
   (dorun (map
-           #(do
-              (println (format-row %))
-              (println "-----------"))
+           (fn [row]
+               (println (format-row row))
+               (println "-----------"))
            (partition 3 @board))))
 
 ;-----------------
@@ -65,22 +58,25 @@
 (defn declare-winner-and-exit
   [winner]
   (print-formatted-board)
-  (println winner " wins! Game YOver.")
+  (println winner "wins! Game YOver.")
   (System/exit 0))
 
-(defn x-wins?
-  []
-  (some #(.containsAll @x-spots %) winning-combos))
+(defn indicies-of-set
+  "Returns set of indices of all spots occupied by provided string"
+  [s]
+  (set (keep-indexed
+    (fn [idx val] (when (= val s) idx))
+    @board)))
 
-(defn o-wins?
-  []
-  (some #(.containsAll @o-spots %) winning-combos))
+(defn wins?
+  [s]
+  (some #(set/subset? (set %) (indicies-of-set s)) winning-combos))
 
 (defn check-for-win
   []
   (cond
-    (x-wins?) (declare-winner-and-exit "X")
-    (o-wins?) (declare-winner-and-exit "O")
+    (wins? "X") (declare-winner-and-exit "X")
+    (wins? "O") (declare-winner-and-exit "O")
     (all-spots-filled?) (declare-winner-and-exit "No one")))
 
 ;-----------------
@@ -89,10 +85,11 @@
 (defn ask-for-user-move
   []
   (print-formatted-board)
-  (println "Please select your spot 0 - 8")
+  (println "Please select your spot 0 - 8, yo.")
   (s/trim (read-line)))
 
 (defn valid-input?
+  "Checks whether the given string input is an open spot."
   [input]
   (contains? (set (map str (open-spots))) input))
 
@@ -101,24 +98,17 @@
   "Checks whether the given string input is an open spot. Returns cast to number if it is."
   (when (valid-input? input) (read-string input)))
 
-(defn record-play
-  [spot x-or-o]
-  (case x-or-o
-    "X" (swap! x-spots conj spot)
-    "O" (swap! o-spots conj spot)))
-
 (defn fill-spot
   [spot x-or-o]
   (let [updated-board (map-indexed #(if (= %1 spot) x-or-o %2) @board)]
     (reset! board updated-board)
-    (record-play spot x-or-o)
     (check-for-win)))
 
 (declare handle-user-input)
 (defn make-computer-move
   []
   (let [spot (rand-nth (open-spots))]
-    (println "Computer is thinking...")
+    (println "Computer is thinking, yo...")
     (fill-spot spot "O")
     (handle-user-input (ask-for-user-move))))
 
@@ -133,7 +123,7 @@
   (if-let [spot (validate-input input)]
     (make-user-move spot)
     (do
-      (println input " is not a playable spot. Try again.")
+      (println input " is not a playable spot. Try again, yo.")
       (recur (ask-for-user-move)))))
 
 ;-----------------
@@ -141,8 +131,8 @@
 ;-----------------
 (defn play-ball
   []
-  (println "Welcome to Tic Tac Yo.")
-  (println "You will be playing as X.")
+  (println "Welcome to Tic Tac Yo, yo.")
+  (println "You will be playing as X, yo.")
   (handle-user-input (ask-for-user-move)))
 
 (defn -main

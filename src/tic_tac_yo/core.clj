@@ -1,4 +1,5 @@
 (ns tic-tac-yo.core
+  (:require [clojure.string :as s])
   (:gen-class))
 
 (declare handle-user-input)
@@ -42,7 +43,7 @@
   "Returns user-friendly formatted row
    Ex: ' X |   | O '"
   [row]
-  (clojure.string/join "|" (map format-spot row)))
+  (s/join "|" (map format-spot row)))
 
 (defn print-formatted-board
   "Returns a user-friendly formatted board
@@ -57,7 +58,6 @@
               (println (format-row %))
               (println "-----------"))
            (partition 3 @board))))
-
 
 ;-----------------
 ;CHECK WIN
@@ -88,7 +88,7 @@
 
 (defn validate-input
   [input]
-  "Checks whether the given string input is an open spot. Returns as number if it is."
+  "Checks whether the given string input is an open spot. Returns cast to number if it is."
   (if (.contains (map str (open-spots)) input) (read-string input)))
 
 (defn record-play

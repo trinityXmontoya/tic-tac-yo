@@ -1,14 +1,6 @@
 # tic-tac-yo
 
-A Clojure library designed to ... well, that part is up to you.
+command-line tic-tac-toe game. my submission to Recurse Center
 
-## Usage
-
-FIXME
-
-## License
-
-Copyright © 2019 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+### Notes
+I intentionally chose to leave this simple (user cannot choose between playing as X or O, the program exits when the game is over, and I did not break it into separate files / namespaces as I would have if this was production code) :)

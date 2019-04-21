@@ -1,6 +1,6 @@
 # tic-tac-yo
 
-command-line tic-tac-toe game. my submission to Recurse Center
+command-line tic-tac-toe game. written in Clojure after not having written any Clojure for ~2yrs. my submission to Recurse Center!
 
 ## Options to Run
 1. use [Leiningen](https://leiningen.org/)
